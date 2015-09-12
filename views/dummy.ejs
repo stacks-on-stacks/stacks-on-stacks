@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  .bugreport{
+    color:#800000;
+    font-size:75%;
+    background-color:#DDDDDD;
+  }
+
+  </style>
+
+  <script src=
+  "http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"
+  type="text/javascript"></script>
+  <script src=
+  "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+  <script src="controllers/trips.js"></script>
+  <script src="controllers/profile.js"></script>
+  <script src="controllers/friends.js"></script>
+  <script src="controllers/messages.js"></script>
+  <script src="controllers/blogs.js"></script>  
+  <script src="controllers/feedback.js"></script>
+
+
+  <title></title>
+</head>
+
+<body ng-app="amigo">
+
+  <div ng-controller="MakeTrips">
+    <p>ng-controller="MakeTrips"</p>
+
+    <form type="submit">
+      <label>Destination:</label><input ng-model="destination"><br>
+      <label>Start Time:</label><input ng-model="start" type="date"><br>
+      <label>End Time:</label><input ng-model="end" type="date"><br>
+      <label>Activities for trip/Seperate by Comma</label><input ng-model="activities">
+            <label>trip pictures (url)</label><input ng-model="tripPic">
+      <button ng-click="makeTrip()">Make Trip</button>
+    </form>{{ response }}
+  </div>
+  <hr>
+
+  <div ng-controller="AddProfile">
+    <p>ng-controller="AddProfile"</p>
+
+    <form type="submit">
+      <label>Profile</label>
+      <textarea ng-model="profile"></textarea><br>
+      <label>Profile Pic (URL)<input ng-model="profilepic"><BR>
+      <button ng-click="addProfile()">Add/update profile to signed in
+      user</button>
+    </form>{{ response }}
+    <br>
+    <PRE class="bugreport">
+Bugs:
+* Can create/edit profile for recently signed-up user, but not for logged-in user</PRE>
+  </div>
+
+  <HR>
+    <div ng-controller="GetProfile">
+    <p>ng-controller="GetProfile"</p>
+
+    <form type="submit">
+      <label>username</label>
+      <input ng-model="username"></input><br>
+      <button ng-click="getProfile()">Get Profile of Username</button>
+    </form><BR>
+    id#: {{ user_id }} <BR>
+    email: {{ user_email }} <BR>
+    password(hashed): {{ user_hashpass }} <BR>
+    fb_id: {{ user_fb_id }} <BR>
+    fb_token: {{ user_fb_token }} <BR>
+    profile: {{ user_profile }} <BR>
+    <br>
+    <PRE class="bugreport">No Bugs To Report</PRE>
+  </div>
+
+<HR>
+
+    <div ng-controller="GetTrips">
+    <p>ng-controller="GetTrips"</p>
+
+    <form type="submit">
+      <label>Username: </label>
+      <input ng-model="username"></input><br>
+      <button ng-click="getTrips()">Get Trips</button>
+    </form><BR>
+
+    <div ng-repeat="trip in trips">
+
+    <UL>
+    <LI>{{trip.username}}</LI>
+      <UL>
+      <LI>{{trip.dest_name}}</LI>
+      <LI>{{trip.geocode_latitude}}</LI>
+      <LI>{{trip.geocode_longitude}}</LI>
+      <LI>{{trip.time_start}}</LI>
+      <LI>{{trip.time_end}}</LI>
+      </UL>
+    </UL>
+    </div>
+    <br>
+    <PRE class="bugreport">No Bugs To Report</PRE>
+  </div>
+
+<HR>
+
+
+  <div ng-controller="GetTripsByTime">
+    <p>ng-controller="GetTripsByTime"</p>
+
+    <form type="submit">
+      <label>Start Time:</label><input ng-model="start" type="date"><br>
+      <label>End Time:</label><input ng-model="end" type="date"><br>
+      <button ng-click="getTripsByTime()">Get Trips by Time</button>
+    </form> <div ng-repeat="trip in trips">
+    {{trip}}
+    </div>
+  </div>
+  <hr>
+<table><tr><td>
+    <div ng-controller="Befriend">
+    <p>ng-controller="Befriend"</p>
+
+    <form type="submit">
+      <label>Friender (Username):</label><input ng-model="friender"><br>
+      <label>Friendee (Username):</label><input ng-model="friendee"><br>
+      <button ng-click="befriend()">Befriend</button> {{befriend_response}}
+    </form> 
+  </div>
+  </td><td>
+    <div ng-controller="GetFriends">
+    <p>ng-controller="GetFriends"</p>
+    <form type="submit">
+      <label>Username:</label><input ng-model="username">
+<button ng-click="getFriends('myFriends')">Get who I've friended</button>
+     <button ng-click="getFriends('friendsMe')">get who friended me</button>
+     {{friends}}
+     <ul ng-repeat="friend in friends">
+     <li>{{friend.username}}</li>
+     </ul>
+
+
+    </form>
+</div>
+
+
+
+
+  </td></tr></table>
+  <hr>
+
+<table width="100%"><tr><td>
+    <div ng-controller="SendMessage">
+    <p>ng-controller="SendMessage"</p>
+
+    <form type="submit">
+      <label>Sender:</label><input ng-model="sender"><br>
+      <label>Recipient:</label><input ng-model="reciever"><br>
+      <label>Subject:</label><input ng-model="subject"><br>
+      <textarea ng-model="content"></textarea><br>
+      <button ng-click="sendMessage()">send</button> {{message_response}}
+    </form> 
+  </div>
+
+  </td>
+  <td>
+    <div ng-controller="GetMessages">
+    <p>ng-controller="GetMessages"</p>
+    <form>
+     <label>Username:</label><input ng-model="username"><br>
+     <button ng-click="getMessages('receiver')">Get messages I recieved</button>
+     <button ng-click="getMessages('sender')">Get messages I sent</button>
+     {{messages}}
+     <div ng-repeat="message in messages">
+     <BR>To:   {{message.receiver}}
+     <BR>from: {{message.sender}}
+     <br>subj: {{message.subject}}
+     <br>body: {{message.body}}
+     </div>
+     </form>
+    </div>
+
+
+  </td>
+
+
+
+  </tr></table>
+  <hr>
+
+
+<table width="100%"><tr><td>
+    <div ng-controller="AddFeedback">
+    <p>ng-controller="AddFeedback"</p> 
+
+    <form type="submit">
+      <label>author:</label><input ng-model="author"><br>
+      <label>subject(person):</label><input ng-model="subject"><br>
+      <textarea ng-model="feedback"></textarea><br>
+      <button ng-click="addFeedback()">send</button> {{debug_response}}
+    </form> 
+  </div>
+
+  </td>
+  <td>
+    <div ng-controller="GetFeedback">
+    <p>ng-controller="GetFeedback"</p>
+    <form>
+     <label>Username:</label><input ng-model="username"><br>
+     <button ng-click="getFeedback('author')">Get feedback I wrote</button>
+     <button ng-click="getFeedback('subject')">Get feedback about me</button>
+     {{feedbacks}}
+     <div ng-repeat="feedback in feedbacks">
+     <BR>author:   {{feedback.author}}
+     <BR>subject: {{feedback.subject}}
+     <br>feedback: {{feedback.feedback}}
+     </div>
+     </form>
+    </div>
+
+
+  </td>
+
+
+
+  </tr></table>
+  <hr>
+
+
+<table width="100%"><tr><td>
+    <div ng-controller="WriteBlog">
+    <p>ng-controller="WriteBlog"</p>
+
+    <form type="submit">
+      <label>Author:</label><input ng-model="author"><br>
+      <label>Subject:</label><input ng-model="subject"><br>
+      <textarea ng-model="body"></textarea><br>
+           <label>Blog Pic (URL)<input ng-model="blogpic">
+      <button ng-click="publishBlog()">publish</button> {{debug_response}}
+    </form> 
+  </div>
+
+  </td>
+  <td>
+    <div ng-controller="GetBlogs">
+    <p>ng-controller="GetBlogs"</p>
+    <form>
+     <label>Username:</label><input ng-model="username"><br>
+     <button ng-click="getBlogs()">Get blogs</button>
+     {{blogs}}
+     <div ng-repeat="blog in blogs">
+     <BR>Author:   {{blog.author_name}}
+     <BR>Published At: {{blog.created_at}}
+     <br>subj: {{blog.subject}}
+     <br>body: {{blog.body}}
+     <BR>...<BR>
+     </div>
+     </form>
+     {{debug_response}}
+    </div>
+
+
+  </td>
+
+
+
+  </tr></table>
+  <hr>
+
+
+
+
+
+
+
+</body>
+</html>

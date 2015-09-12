@@ -35,16 +35,9 @@ h6 {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background-color: #EA9500;
+    background-color: #abb4cc;
     background-size: cover;
     min-height: 85%;
-}
-
-.view-box {
-    background-color: #9C6FD3;
-    margin: 200px;
-    box-shadow: 2px 2px 2px 3px (0,0,0,0.6);
-    border-radius: 5px;
 }
 
 .intro-message {

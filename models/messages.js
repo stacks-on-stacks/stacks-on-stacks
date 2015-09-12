@@ -19,42 +19,34 @@ module.exports for messages.js
 
 module.exports = function(knex) {
   return {
-    addMessage: function(sender, reciever, subject, body) { // int, int, string, string
-      knex('messages')
+    addMessage: function(sender, receiver, subject, body) { // int, int, string, string
+      return knex('messages')
         .insert({
           'sender_id': sender,
           'receiver_id': receiver,
           'subject': subject,
           'body': body
         });
-      return true;
     },
     deleteMessage: function(msgId) { // int, int, string, string
-      knex('messages')
+      return knex('messages')
         .where({
           'id': msgId
         }).del();
-      return true;
     },
-    getMyMessages: function(userId) {
-      return knex('messages')
-        .where({
-          'receiver_id': userId
-        })
-        .select()
-        .then(function(messages) {
-          return messages;
-        });
-    },
-    getMySentMessages: function(userId) {
-      return knex('messages')
-        .where({
-          'sender_id': userId
-        })
-        .select()
-        .then(function(messages) {
-          return messages;
-        });
+    getMessages: function(username, isReceiver) { // int, string(either 'receiver' or 'sender')
+       isReceiver = isReceiver || 'receiver_id'; // default case just in case of errors. 
+        if(isReceiver === 'receiver'){
+          grabId = 'rUsers.username';
+        }
+        if(isReceiver === 'sender'){
+          grabId = 'sUsers.username';
+        }
+       return knex('messages') // must use aliases here
+        .innerJoin('users AS rUsers', 'rUsers.id', 'messages.receiver_id') // need to use the "as" to alias
+        .innerJoin('users AS sUsers', 'sUsers.id', 'messages.sender_id')
+        .where(grabId, username)
+        .select('sUsers.username as sender', 'rUsers.username as receiver', 'subject', 'body');
     }
   };
 }

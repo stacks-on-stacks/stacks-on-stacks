@@ -17,30 +17,36 @@ module.exports for blogs.js
 
 -------------------------------------*/
 
-module.exports = {
-  // takes a comma delimited string, splits it into an array
-  addBlog: function(author, subject, body){
-    var created = new Date();
-    knex('blogs').insert({
-      'author_id': author,
-      'subject': subject,
-      'body': body,
-      'created_at' created
-    })
-  },
-  removeBlog: function(blogId){
-    knex('blogs')
-      .where({id: blog_id})
-      .del();
-  },
-  modifyBlog: function(blogId, subject, body){
-    knex('blogs')
-      .where({id: blog_id})
-      .update({'subject': subject, 'body': body})
-  },
-  getBlogsByUser: function(userId){
-    return knex('blogs')
-      .where({user_id: userId})
-      .select();
-  }
+module.exports = function(knex) {
+
+  return {
+    // takes a comma delimited string, splits it into an array
+    publishBlog: function(author, subject, body, media) {
+      var created = new Date();
+      return knex('blogs')
+        .insert({
+          'author_id': author,
+          'subject': subject,
+          'body': body,
+          'created_at': created
+        })
+        .returning('id')
+        .into('blogs')
+        .then(function(id) {
+          id = id[0];
+          return knex.insert({
+            'url': media,
+            'blog_id': id,
+            'user_id': null,
+            'trip_id': null
+          }).into('media');
+        });
+    },
+    getBlogs: function(username) {
+      return knex('blogs')
+        .innerJoin('users', 'users.id', 'blogs.author_id')
+        .where('username', username)
+        .select('username as author_name', 'subject', 'body', 'created_at');
+    }
+  };
 };

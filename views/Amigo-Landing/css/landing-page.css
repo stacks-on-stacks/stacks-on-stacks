@@ -35,22 +35,8 @@ h6 {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background: url(../img/amigoLP-focus.jpg) no-repeat center center;
+    background: url(../img/amigoLP.jpg) no-repeat center center;
     background-size: cover;
-}
-
-/*.intro-box {
-    background-color:rgba(107, 97, 97, 0.5);
-    max-height: 500px;
-    max-width: 600px;
-    margin-top:50px;
-    margin-left: 275px;
-    
-    padding-bottom: 20px;
-    border-radius: 2%;
-}*/
-#submit {
-  margin-top: 5px;
 }
 
 .intro-message {
@@ -59,10 +45,9 @@ h6 {
     padding-bottom: 20%;
 }
 
-
 .intro-message > h1 {
     margin: 0;
-    text-shadow: 2px 2px 3px rgba(0,0,0,1);
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
     font-size: 5em;
 }
 
@@ -73,20 +58,8 @@ h6 {
 }
 
 .intro-message > h3 {
-    text-shadow: 2px 2px 3px rgba(0,0,0,1);
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
 }
-
-.intro-view {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  padding:20px;
-}
-
-#password {
-  margin-top: 4px;
-}
-
 
 @media(max-width:767px) {
     .intro-message {

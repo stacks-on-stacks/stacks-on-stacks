@@ -24,34 +24,34 @@ module.exports for friends.js
 
 module.exports = function(knex) {
   return {
-    befriend: function(frienderId, friendeeId) { // int, int, string, string
-      knex('friends')
+    befriend: function(frienderId, friendeeId) { // int, int -- logic to get IDs from username is in controller
+      return knex('friends')
         .insert({
           'friender_id': frienderId,
           'friendee_id': friendeeId
         });
-      return true;
     },
     defriend: function(friendshipId) { // int
-      knex('friends')
+      return knex('friends')
         .where({
           'id': friendshipId
         })
         .del();
-      return true;
     },
-    listFriends: function(user) {
+    getFriends: function(userCriteria) {
+      var criteria = {};
+      criteria[userCriteria.type] = userCriteria.id;
+      var otherType = '';
+      if (userCriteria.type === 'friender_id') {
+        otherType = 'friendee_id';
+      }
+      if (userCriteria.type === 'friendee_id') {
+        otherType = 'friender_id';
+      }
+
       return knex('friends')
-        .where({
-          'friender_id': user
-        })
-        .select();
-    },
-    listWhoFriendsMe: function(user) {
-      return knex('friends')
-        .where({
-          'friendee_id': user
-        })
+        .innerJoin('users', 'users.id', 'friends.' + otherType)
+        .where(criteria)
         .select();
     }
   };

@@ -33,15 +33,15 @@ module.exports for trips.js
 
 module.exports = function(knex) {
   return {
-    addTrip: function(destination, timeStart, timeEnd) { // string, timestamp, timestamp.
-      var geocode = getGeocode(destination);
+    addTrip: function(destination, geocode_latitude, geocode_longitude, timeStart, timeEnd) { // string, timestamp, timestamp.
+      // var geocode = getGeocode(destination);
       return knex('trips')
         .insert({
           'dest_name': destination,
-          'geocode_latitude': geocode.latitude,
-          'geocode_longitude': geocode.longitude,
+          'geocode_latitude': geocode_latitude,
+          'geocode_longitude': geocode_longitude,
           'time_start': timeStart,
-          'time_end': timeEnd,
+          'time_end': timeEnd
         });
     },
     deleteTrip: function(trip) {
@@ -62,69 +62,75 @@ module.exports = function(knex) {
         });
     },
 
+    getTripsByUsername: function(username) {
+      return knex('users')
+        .innerJoin('users_trips', 'users.id', 'users_trips.user_id')
+        .innerJoin('trips', 'trips.id', 'users_trips.trip_id')
+        .where('username', username)
+        .select('username', 'dest_name', 'geocode_latitude', 'geocode_longitude', 'time_start', 'time_end');
+    },
+
+
+
     // BE SURE TO INCLUDE:
     // <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
-    searchByDistanceAndTime: function(latitude, longitude, distance, time) {
-      return knex('trips')
-        .select()
-        .then(function(trips) {
-          return trips.map(function(trip) {
-            if (google.maps.geometry.spherical.computeDistanceBetween({
-              'lat': latitude,
-              'lng': longitude
-            }, {
-              'lat': trip.geocode_latitude,
-              'lng': trip.geocode_longitude
-            }) && time >= trip.time_start && time <= trip.time_end) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-        });
-    },
+    // searchByDistanceAndTime: function(latitude, longitude, distance, time) {
+    //   return knex('trips')
+    //     .select()
+    //     .then(function(trips) {
+    //       return trips.map(function(trip) {
+    //         if (google.maps.geometry.spherical.computeDistanceBetween({
+    //           'lat': latitude,
+    //           'lng': longitude
+    //         }, {
+    //           'lat': trip.geocode_latitude,
+    //           'lng': trip.geocode_longitude
+    //         }) && time >= trip.time_start && time <= trip.time_end) {
+    //           return true;
+    //         } else {
+    //           return false;
+    //         }
+    //       });
+    //     });
+    // },
 
-    searchTripsByDistance: function(latitude, longitude, distance,
-      includePastTrips) { // int, int, int, bool
-      var time;
-      includePastTrips = false; // delete this if implimenting past trips checkbox
-      return knex('trips')
-        .select()
-        .then(function(trips) {
-          if (includePastTrips) {
-            time = 0;
-          } else {
-            time = new Date();
-          }
-          return trips.map(function(trip) {
-            if (google.maps.geometry.spherical.computeDistanceBetween({
-              'lat': latitude,
-              'lng': longitude
-            }, {
-              'lat': trip.geocode_latitude,
-              'lng': trip.geocode_longitude
-            }) && time >= trip.time_start) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-        });
-    },
+    // searchTripsByDistance: function(latitude, longitude, distance, includePastTrips) { // int, int, int, bool
+    //   var time;
+    //   includePastTrips = false; // delete this if implimenting past trips checkbox
+    //   return knex('trips')
+    //     .select()
+    //     .then(function(trips) {
+    //       if (includePastTrips) {
+    //         time = 0;
+    //       } else {
+    //         time = new Date();
+    //       }
+    //       return trips.map(function(trip) {
+    //         if (google.maps.geometry.spherical.computeDistanceBetween({
+    //           'lat': latitude,
+    //           'lng': longitude
+    //         }, {
+    //           'lat': trip.geocode_latitude,
+    //           'lng': trip.geocode_longitude
+    //         }) && time >= trip.time_start) {
+    //           return true;
+    //         } else {
+    //           return false;
+    //         }
+    //       });
+    //     });
+    // },
 
-    searchTripsByTime: function(begin, end) { // timestamp, timestamp
-      return knex('trips')
-        .select()
-        .then(function(trips) {
-          return trips.map(function(trip) {
-            if ((begin >= trip.time_start && begin <= trip.time_end) ||
-              (end >= trip.time_start && end <= trip.time_end)) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-        });
+    getTripsByTime: function(begin, end) {
+      return knex('users')
+        .innerJoin('users_trips', 'users.id', 'users_trips.user_id')
+        .innerJoin('trips', 'trips.id', 'users_trips.trip_id')
+        .whereBetween('time_start', [begin, end])
+        .orWhereBetween('time_end', [begin, end])
+        .orWhere('time_start', '>', begin)
+        .andWhere('time_end', '>', end) //ugh, what's the logic here for and and or when you can't use parentheses?
+        .select('username', 'dest_name', 'geocode_latitude', 'geocode_longitude', 'time_start', 'time_end');
     }
+
   };
 };
