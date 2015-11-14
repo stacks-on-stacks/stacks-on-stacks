@@ -1,20 +1,6 @@
 var path = require('path');
 
 module.exports = function(app, passport, connection) {
-
-  // TODO: place these requires in the correct location
-  // This should have been done in the server.js file after knex was made
-  // but before the routes were included.
-  // I don't want to move it at this point because it might break everything.
-  var UsersTrips = require('../models/users_trips')(connection);
-  var Trips = require('../models/trips')(connection);
-  var Users = require('../models/users')(connection);
-  var Friends = require('../models/friends')(connection);
-  var Messages = require('../models/messages')(connection);
-  var Blogs = require('../models/blogs')(connection);
-  var Feedback = require('../models/amigo_feedback')(connection);
-  var Activities = require('../models/activities')(connection);
-  var Media = require('../models/media')(connection);
   
   app.get('/', function(req, res) {
     res.render('index.ejs', { signupMessage: req.flash('signupMessage'), 
@@ -325,23 +311,6 @@ module.exports = function(app, passport, connection) {
             successRedirect : '/profile',
             failureRedirect : '/'
         }));
-
-    // =============================================================================
-    // UNLINK ACCOUNTS =============================================================
-    // =============================================================================
-    // used to unlink accounts. for social accounts, just remove the token
-    // for local account, remove email and password
-    // user account will stay active in case they want to reconnect in the future
-
-    // facebook -------------------------------
-    app.get('/unlink/facebook', function(req, res) {
-        var user            = req.user;
-        user.fb_token = undefined;
-        user.fb_id = undefined;
-        var updateQuery = "UPDATE users set fb_id=?, fb_token=? where id=?";
-        connection.query(updateQuery, [null, null, user.id]);
-        res.redirect('/dashboard');
-    });
 
     function isLoggedIn(req, res, next) {
         if (req.isAuthenticated()) {

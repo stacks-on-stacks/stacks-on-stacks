@@ -1,13 +1,10 @@
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
-var bcrypt = require('bcrypt')
+var bcrypt = require('bcrypt-nodejs')
 var configAuth = require('./auth');
 
 
-module.exports = function(passport, knex) {
-
-  // need to require Users inside this function so we can pass the db connection (knex)
-  var Users = require('../models/users')(knex);
+module.exports = function(passport, knex, Users) {
 
   // used to serialize the user for the session
   // adds user.id to all requests from now until logout
@@ -44,7 +41,7 @@ module.exports = function(passport, knex) {
 
         // set the user's local credentials
         newUser.username = username;
-        newUser.password = bcrypt.hashSync(password, 10);
+        newUser.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
         Users.signupLocal(newUser.username, newUser.password).then(function(user) {
           newUser.id = user[0];
